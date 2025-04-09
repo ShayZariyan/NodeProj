@@ -1,0 +1,22 @@
+<h1 class="text-center my-4 text-info fw-bold" style="text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);">
+  ⚡ All Categories
+</h1>
+
+<div class="container">
+  <div class="row">
+    {{#each categories}}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-lg border border-info bg-dark text-light">
+        <img src="/images/{{this.picname}}" class="card-img-top img-fluid rounded-top" alt="{{this.Cname}}" style="max-height: 220px; object-fit: cover;">
+        <div class="card-body d-flex flex-column text-center">
+          <h5 class="card-title text-info fw-semibold">{{this.Cname}}</h5>
+          <p class="card-text flex-grow-1">{{this.Cdesc}}</p>
+          <a href="/categories/category/{{this.Cid}}" class="btn btn-outline-info mt-auto">
+            <i class="bi bi-box-arrow-in-right me-1"></i> View Products
+          </a>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>

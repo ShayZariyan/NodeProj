@@ -1,0 +1,77 @@
+<!-- Category Banner -->
+<section class="text-white text-center py-5 mb-4" style="background: linear-gradient(to right, #141e30, #243b55);">
+  <h1 class="display-5 fw-bold">
+    <i class="bi bi-lightning-fill text-info"></i> All Products in {{category.Cname}}
+  </h1>
+</section>
+
+<!-- Filter + Sort -->
+<div class="container mb-4">
+  <div class="row justify-content-between align-items-end g-2">
+
+    <!-- Filter -->
+    <div class="col-auto">
+      <form method="GET" class="d-flex gap-2 align-items-end">
+        <div>
+          <label class="form-label text-light mb-1">Min</label>
+          <input type="number" name="min" class="form-control form-control-sm bg-dark text-info border-info" value="{{query.min}}" placeholder="Min">
+        </div>
+        <div>
+          <label class="form-label text-light mb-1">Max</label>
+          <input type="number" name="max" class="form-control form-control-sm bg-dark text-info border-info" value="{{query.max}}" placeholder="Max">
+        </div>
+        <button type="submit" class="btn btn-sm neon-btn fw-semibold">
+          <i class="bi bi-funnel-fill me-1"></i> Filter
+        </button>
+      </form>
+    </div>
+
+    <!-- Sort -->
+    <div class="col-auto">
+      <form method="GET" class="d-flex align-items-end gap-2">
+        {{#if query.min}}<input type="hidden" name="min" value="{{query.min}}">{{/if}}
+        {{#if query.max}}<input type="hidden" name="max" value="{{query.max}}">{{/if}}
+        <div>
+          <label class="form-label text-light mb-1">Sort by</label>
+          <select name="sort" class="form-select form-select-sm bg-dark text-light border-info" style="width: 160px;" onchange="this.form.submit()">
+            <option value="">Default</option>
+            <option value="price_asc" {{#ifEquals query.sort "price_asc"}}selected{{/ifEquals}}>Price: Low to High</option>
+            <option value="price_desc" {{#ifEquals query.sort "price_desc"}}selected{{/ifEquals}}>Price: High to Low</option>
+          </select>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<!-- Product Grid -->
+<div class="container">
+  <div class="row">
+    {{#each products}}
+    <div class="col-md-4 mb-4">
+      <div class="card bg-dark text-light h-100 shadow-sm border border-info">
+        <div class="text-center p-3" style="height: 220px; background-color: #1a1c20;">
+          <img src="/images/{{this.picname}}" alt="{{this.Pname}}" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+        </div>
+        <div class="card-body text-center d-flex flex-column">
+  <h5 class="card-title text-info">{{this.Pname}}</h5>
+  <p class="card-text text-muted">{{this.Pdesc}}</p>
+  <p class="fw-bold text-warning">Price: ${{this.Price}}</p>
+  <a href="/products/{{this._id}}" class="btn btn-sm btn-outline-info">View Details</a>
+  <a href="/checkout/single/{{this._id}}" class="btn btn-sm btn-primary mt-2">
+    <i class="bi bi-lightning-fill me-1"></i> Buy Now
+  </a>
+</div>
+
+      </div>
+    </div>
+    {{/each}}
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="/categories" class="btn btn-outline-light">
+      <i class="bi bi-arrow-left me-1"></i> Back to Categories
+    </a>
+  </div>
+</div>

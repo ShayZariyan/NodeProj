@@ -1,0 +1,60 @@
+<section class="container py-5">
+  <div class="card bg-dark text-light shadow-lg border border-info">
+    <div class="row g-0">
+      
+      <!-- Product Image -->
+      <div class="col-md-5">
+        <div class="p-3">
+          <img 
+            src="/images/{{product.picname}}" 
+            class="img-fluid rounded border border-secondary w-100"
+            alt="{{product.Pname}}" 
+            style="object-fit: contain; max-height: 400px;"
+          >
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="col-md-7">
+        <div class="card-body d-flex flex-column h-100 justify-content-between">
+          <div>
+            <h2 class="card-title text-info fw-bold mb-3">
+              {{product.Pname}}
+            </h2>
+            <p class="card-text text-light">{{product.Pdesc}}</p>
+            <p class="fw-bold text-warning fs-5">Price: ${{product.Price}}</p>
+          </div>
+
+          <!-- Action Buttons -->
+<div class="mt-4 d-flex flex-wrap gap-3">
+  <!-- Add to Cart -->
+  <a 
+    href="/cart/add/{{product._id}}" 
+    class="btn btn-success"
+  >
+    🛒 Add to Cart
+  </a>
+
+  <!-- Buy Now -->
+  <a 
+    href="/checkout/single/{{product._id}}" 
+    class="btn btn-primary fw-semibold"
+  >
+    <i class="bi bi-lightning-fill me-1"></i> Buy Now
+  </a>
+
+  <!-- Back to Products -->
+  <a 
+    href="/products" 
+    class="btn btn-outline-info fw-semibold"
+  >
+    <i class="bi bi-arrow-left me-1"></i> Back to Products
+  </a>
+</div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

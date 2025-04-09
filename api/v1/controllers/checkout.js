@@ -1,0 +1,167 @@
+const Cart = require('../models/cart');
+const Product = require('../models/product');
+const Order = require('../models/order');
+
+module.exports = {
+  showCheckoutPage: async (req, res) => {
+    try {
+      const userId = req.user._id;
+      const cart = await Cart.findOne({ userId }).populate('items.productId');
+
+      if (!cart || cart.items.length === 0) {
+        return res.redirect('/cart');
+      }
+
+      const cartItems = cart.items.map(item => ({
+        _id: item.productId._id,
+        Pname: item.productId.Pname,
+        Price: item.productId.Price,
+        quantity: item.quantity,
+      }));
+
+      const total = parseFloat(
+        cartItems.reduce((sum, item) => sum + item.Price * item.quantity, 0).toFixed(2)
+      );
+      
+
+      res.render('checkout', {
+        title: 'Checkout',
+        cart: cartItems,
+        total
+      });
+
+    } catch (err) {
+      console.error('❌ Error showing checkout page:', err);
+      res.status(500).render('error', { title: 'Error', message: 'Could not load checkout page' });
+    }
+  },
+
+  placeOrder: async (req, res) => {
+    try {
+      const userId = req.user._id;
+      const { name, address, city, zip, phone } = req.body;
+  
+      const cart = await Cart.findOne({ userId }).populate('items.productId');
+      if (!cart || cart.items.length === 0) return res.redirect('/cart');
+  
+      // 💡 Define cartItems here:
+      const cartItems = cart.items.map(item => ({
+        _id: item.productId._id,
+        Pname: item.productId.Pname,
+        Price: item.productId.Price,
+        quantity: item.quantity,
+      }));
+  
+      const total = parseFloat(
+        cartItems.reduce((sum, item) => sum + item.Price * item.quantity, 0).toFixed(2)
+      );
+  
+      const order = new Order({
+        userId,
+        items: cart.items.map(item => ({
+          productId: item.productId._id,
+          quantity: item.quantity
+        })),
+        shipping: { name, address, city, zip, phone },
+        total
+      });
+  
+      await order.save();
+      cart.items = [];
+      await cart.save();
+  
+      res.render('confirmation', { title: 'Order Placed', order });
+  
+    } catch (err) {
+      console.error('❌ Error placing order:', err);
+      res.status(500).render('error', { title: 'Error', message: 'Failed to place order' });
+    }
+  },  
+  
+  checkoutSinglePage: async (req, res) => {
+    try {
+      const userId = req.user._id;
+      const productId = req.params.id;
+  
+      const product = await Product.findById(productId);
+      if (!product) {
+        return res.status(404).render('error', { title: 'Not Found', message: 'Product not found' });
+      }
+  
+      // Fetch existing cart
+      const cart = await Cart.findOne({ userId }).populate('items.productId');
+  
+      let cartItems = [];
+  
+      if (cart && cart.items.length > 0) {
+        cartItems = cart.items.map(item => ({
+          _id: item.productId._id,
+          Pname: item.productId.Pname,
+          Price: item.productId.Price,
+          quantity: item.quantity
+        }));
+      }
+  
+      // Merge the selected product
+      const existing = cartItems.find(i => i._id.toString() === product._id.toString());
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cartItems.push({
+          _id: product._id,
+          Pname: product.Pname,
+          Price: product.Price,
+          quantity: 1
+        });
+      }
+  
+      // Calculate total
+      const total = parseFloat(
+        cartItems.reduce((sum, item) => sum + item.Price * item.quantity, 0).toFixed(2)
+      );
+      
+  
+      // Render with merged data
+      res.render('checkout', {
+        title: 'Buy Now',
+        cart: cartItems,
+        total,
+        single: true,
+        productId: product._id
+      });
+  
+    } catch (err) {
+      console.error('❌ Error loading single checkout page:', err);
+      res.status(500).render('error', { title: 'Error', message: 'Could not load single product checkout' });
+    }
+  },
+  
+
+  // ✅ HANDLE SINGLE PRODUCT ORDER CONFIRMATION
+  placeSingleOrder: async (req, res) => {
+    try {
+      const userId = req.user._id;
+      const { name, address, city, zip, phone, productId } = req.body;
+
+      const product = await Product.findById(productId);
+      if (!product) {
+        return res.status(404).render('error', { title: 'Error', message: 'Product not found' });
+      }
+
+      const order = new Order({
+        userId,
+        items: [{ productId: product._id, quantity: 1 }],
+        shipping: { name, address, city, zip, phone },
+        total: product.Price
+      });
+
+      await order.save();
+      res.render('confirmation', { title: 'Order Placed', order });
+
+    } catch (err) {
+      console.error('❌ Error placing single order:', err);
+      res.status(500).render('error', { title: 'Error', message: 'Failed to place single order' });
+    }
+  }
+};
+

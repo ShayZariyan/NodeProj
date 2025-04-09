@@ -1,0 +1,146 @@
+<style>
+  .hero-section {
+    position: relative;
+    background: linear-gradient(135deg, #0d0d0d, #1f1f1f);
+    color: #f8f9fa;
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .laser-chaos {
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    z-index: 1;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(0, 255, 255, 0.08) 0 2px, transparent 2px 20px),
+      repeating-linear-gradient(-45deg, rgba(255, 0, 255, 0.06) 0 2px, transparent 2px 20px);
+    animation: laserFlow 40s linear infinite;
+    mix-blend-mode: screen;
+  }
+
+  @keyframes laserFlow {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(50px, -50px) rotate(180deg); }
+    100% { transform: translate(0, 0) rotate(360deg); }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  .hero-content h1 {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
+  }
+
+  .hero-content p {
+    font-size: 1.2rem;
+    color: #ced4da;
+    margin-bottom: 2rem;
+  }
+
+  /* 🔼 INCREASED max-height */
+  .carousel-inner img {
+    max-height: 380px;
+    object-fit: contain;
+    border: 3px solid rgba(0, 255, 255, 0.2);
+    border-radius: 12px;
+    background-color: #141414;
+    padding: 10px;
+  }
+
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    background-color: rgba(0, 255, 255, 0.3);
+    border-radius: 50%;
+  }
+
+  .carousel-caption .btn-primary {
+    background-color: #00cfff;
+    border: none;
+    box-shadow: 0 0 10px #00cfff;
+  }
+
+  .carousel-caption .btn-primary:hover {
+    background-color: #00eaff;
+    color: #000;
+  }
+
+  .carousel-caption {
+    background-color: transparent !important;
+    padding: 1rem 1.5rem;
+    bottom: 1.2rem;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+  }
+
+  .carousel-caption h5 {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #00cfff;
+    margin-bottom: 0.4rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  }
+
+  .carousel-caption p {
+    font-size: 0.95rem;
+    color: #e0e0e0;
+    margin-bottom: 0.6rem;
+  }
+
+</style>
+
+<section class="hero-section">
+  <div class="laser-chaos"></div>
+  <div class="hero-content">
+    <h1><i class="bi bi-lightning-charge-fill text-info me-2"></i>Explore Top Products</h1>
+    <p>Premium tech curated for your taste</p>
+
+    <!-- 🟢 INCREASED WIDTH FROM w-75 TO w-85 -->
+    <div id="productCarousel" class="carousel slide w-85 mx-auto mt-3" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        {{#each featuredProducts}}
+          <div class="carousel-item {{#if @first}}active{{/if}}">
+            <img src="/images/{{this.picname}}" class="d-block w-100" alt="{{this.Pname}}">
+            <div class="carousel-caption d-none d-md-block p-3">
+              <h5 class="text-info">{{this.Pname}}</h5>
+              <p>${{this.Price}}</p>
+              <a href="/checkout/single/{{this._id}}" class="btn btn-sm btn-primary mt-2 fw-semibold">
+                <i class="bi bi-lightning-fill me-1"></i> Buy Now
+              </a>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </div>
+</section>
+

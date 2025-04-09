@@ -1,0 +1,84 @@
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card p-4 text-white bg-dark border-0 shadow-sm w-100" style="max-width: 420px;">
+    <h2 class="text-center fw-bold mb-4 text-info">
+      <i class="bi bi-shield-lock-fill me-2"></i> Member Login
+    </h2>
+
+    {{#if error}}
+      <div class="alert alert-danger text-center">
+        {{error}}
+      </div>
+    {{/if}}
+
+    <form action="/user/login" method="POST">
+      <div class="mb-3">
+        <label for="Uname" class="form-label text-light">Username</label>
+        <input type="text" id="Uname" name="Uname" class="form-control classy-input" placeholder="Enter your username" required>
+      </div>
+      <div class="mb-3">
+        <label for="Upass" class="form-label text-light">Password</label>
+        <input type="password" id="Upass" name="Upass" class="form-control classy-input" placeholder="Enter your password" required>
+      </div>
+      <button type="submit" class="btn btn-info w-100 fw-semibold">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Login
+      </button>
+    </form>
+
+    <p class="text-center mt-3">
+      <a href="/auth/register" class="text-decoration-none text-light">
+        <i class="bi bi-person-plus-fill me-1"></i> Create an Account
+      </a>
+    </p>
+
+    <hr class="text-secondary">
+
+    <div class="d-flex flex-column gap-2">
+      <a href="/auth/google" class="btn btn-outline-light">
+        <i class="bi bi-google me-1"></i> Login with Google
+      </a>
+      <a href="/auth/facebook" class="btn btn-outline-light">
+        <i class="bi bi-facebook me-1"></i> Login with Facebook
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  body {
+    background-color: #0f1115;
+  }
+
+  .classy-input {
+    background-color: #1c1e22;
+    color: #ffffff; /* <-- fix: visible input text */
+    border: 1px solid #3a3f47;
+    border-radius: 6px;
+    padding: 10px;
+    transition: border-color 0.3s, background-color 0.3s;
+    caret-color: #17a2b8;
+  }
+
+  .classy-input:focus {
+    background-color: #202328;
+    border-color: #17a2b8;
+    outline: none;
+    color: #ffffff; /* <-- re-enforce on focus */
+  }
+
+  .classy-input::placeholder {
+    color: #888; /* Optional: better placeholder contrast */
+  }
+
+  .btn-info {
+    background-color: #17a2b8;
+    border: none;
+  }
+
+  .btn-info:hover {
+    background-color: #138496;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+</style>

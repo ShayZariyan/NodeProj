@@ -1,0 +1,130 @@
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card p-4 text-white bg-dark border-0 shadow-sm w-100" style="max-width: 480px;">
+    <h2 class="text-center fw-bold mb-4 text-info">
+      <i class="bi bi-person-plus-fill me-2"></i> Create an Account
+    </h2>
+
+    {{#if error}}
+      <div class="alert alert-danger text-center">
+        {{error}}
+      </div>
+    {{/if}}
+
+    <form action="/user/register" method="POST">
+      <div class="mb-3">
+        <label for="Uname" class="form-label text-light">Username</label>
+        <input type="text" id="Uname" name="Uname" class="form-control classy-input" placeholder="Enter your username" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="Upass" class="form-label text-light">Password</label>
+        <input type="password" id="Upass" name="Upass" class="form-control classy-input" placeholder="Enter a strong password" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="fullname" class="form-label text-light">Full Name</label>
+        <input type="text" id="fullname" name="fullname" class="form-control classy-input" placeholder="Enter your full name" required>
+      </div>
+
+      <button type="submit" class="btn btn-info w-100 fw-semibold">
+        <i class="bi bi-person-check-fill me-1"></i> Register
+      </button>
+    </form>
+
+    <p class="text-center mt-3">
+      <a href="/auth" class="text-decoration-none text-light">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Already have an account? Login
+      </a>
+    </p>
+
+    <!-- Social Register -->
+    <div class="d-flex justify-content-between gap-2 mt-3">
+      <a href="/auth/google" class="btn btn-social w-100">
+        <i class="bi bi-google me-2"></i> Register with Google
+      </a>
+      <a href="/auth/facebook" class="btn btn-social-facebook w-100">
+        <i class="bi bi-facebook me-2"></i> Register with Facebook
+      </a>
+    </div>
+
+
+
+  </div>
+</div>
+
+<style>
+  body {
+    background-color: #0f1115;
+  }
+
+  .classy-input {
+  background-color: #1c1e22;
+  color: #ffffff; /* <-- Ensure visible text */
+  border: 1px solid #3a3f47;
+  border-radius: 6px;
+  padding: 10px;
+  transition: border-color 0.3s, background-color 0.3s;
+  caret-color: #17a2b8; /* Optional: neon caret */
+}
+
+.classy-input::placeholder {
+  color: #888; /* Optional: placeholder contrast */
+}
+
+.classy-input:focus {
+  background-color: #202328;
+  border-color: #17a2b8;
+  outline: none;
+  color: #ffffff; /* Enforce again */
+}
+
+
+  .btn-info {
+    background-color: #17a2b8;
+    border: none;
+  }
+
+  .btn-info:hover {
+    background-color: #138496;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .btn-social,
+.btn-social-facebook {
+  font-size: 0.9rem;
+  padding: 6px 10px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-social {
+  background-color: transparent;
+  color: white;
+  border: 1px solid #ccc;
+}
+
+.btn-social:hover {
+  background-color: #ffffff11;
+  border-color: #17a2b8;
+}
+
+.btn-social-facebook {
+  background-color: transparent;
+  color: #00bfff;
+  border: 1px solid #00bfff;
+}
+
+.btn-social-facebook:hover {
+  background-color: #00bfff22;
+}
+
+
+</style>
