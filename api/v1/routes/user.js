@@ -1,13 +1,14 @@
 const express = require('express');
 const userrouter = express.Router();
-
+const verifyToken = require('../middlewares/auth');
 const {
   register,
   login,
   getAll,
   getByID,
   Update,
-  Delete
+  Delete,
+  promoteToManager
 } = require('../controllers/user');
 
 // 🧾 GET all users (admin/debug use)
@@ -27,5 +28,7 @@ userrouter.put('/:id', Update);
 
 // ❌ Delete user by Mongo ID
 userrouter.delete('/:id', Delete);
+
+userrouter.post('/promote/:id', verifyToken,promoteToManager);
 
 module.exports = userrouter;

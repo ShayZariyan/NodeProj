@@ -1,0 +1,23 @@
+<div class="container-fluid py-4">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+      <div class="list-group">
+        <button class="list-group-item list-group-item-action" onclick="loadView('top')">🏆 Top Products</button>
+        <button class="list-group-item list-group-item-action" onclick="loadView('products')">📦 Manage Products</button>
+        <button class="list-group-item list-group-item-action" onclick="loadView('categories')">📂 Manage Categories</button>
+        <button class="list-group-item list-group-item-action" onclick="loadView('users')">👥 View Users</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="col-md-9">
+      <div id="adminContent" class="card bg-dark text-light p-4 shadow-sm">
+        <h3>Welcome, Admin 👋</h3>
+        <p>Select an option from the left to begin.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/admin-panel.js"></script>

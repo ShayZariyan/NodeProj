@@ -13,7 +13,12 @@ const UsersSchema = new mongoose.Schema({
   fullname: {
     type: String,
     required: true
-  }
+  },
+  role: {
+    type: String,
+    enum: ['user', 'manager'],
+    default: 'user'
+  }  
 }, { timestamps: true });
 
 // Fix: consistent naming and default model export

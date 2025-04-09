@@ -1,7 +1,7 @@
 const Cart = require('../models/cart');
 const Product = require('../models/product');
 const Order = require('../models/order');
-
+const axios = require('axios');
 module.exports = {
   showCheckoutPage: async (req, res) => {
     try {
@@ -162,6 +162,74 @@ module.exports = {
       console.error('❌ Error placing single order:', err);
       res.status(500).render('error', { title: 'Error', message: 'Failed to place single order' });
     }
+  },
+  
+  processPayment : async (req, res) => {
+    try {
+      const {
+        name, address, city, zip, phone,
+        ccno, expmonth, expyear, cvv, sum
+      } = req.body;
+  
+      const userId = req.user._id;
+      const expdate = `${expmonth}${expyear.slice(-2)}`;
+  
+      const cart = await Cart.findOne({ user: userId }).populate('items.product');
+      if (!cart || cart.items.length === 0) {
+        return res.render('checkout-failed', { message: 'Cart is empty.' });
+      }
+  
+      const response = await axios.post('https://secure5.tranzila.com/cgi-bin/tranzila31.cgi', null, {
+        params: {
+          supplier: 'tranzilatest',
+          sum,
+          ccno,
+          expdate,
+          cvv,
+          currency: '1',
+          tranmode: 'A',
+          lang: 'il'
+        }
+      });
+  
+      const success = response.data.includes('Response=000');
+  
+      // Prepare items
+      const orderItems = cart.items.map(item => ({
+        product: item.product._id,
+        quantity: item.quantity,
+        price: item.product.Price
+      }));
+  
+      // Save order
+      const order = new Order({
+        user: userId,
+        shipping: { name, address, city, zip, phone },
+        cartItems: orderItems,
+        total: sum,
+        payment: {
+          cardEnding: ccno.slice(-4),
+          status: success ? 'Paid' : 'Failed',
+          tranzilaRaw: response.data
+        }
+      });
+  
+      await order.save();
+  
+      // Clear cart if successful
+      if (success) {
+        cart.items = [];
+        await cart.save();
+        return res.render('checkout-success', { message: 'Payment successful!', order });
+      } else {
+        return res.render('checkout-failed', { message: 'Payment failed.', raw: response.data });
+      }
+  
+    } catch (error) {
+      console.error(error);
+      res.render('checkout-failed', { message: 'An error occurred.', raw: error.message });
+    }
   }
+
 };
 

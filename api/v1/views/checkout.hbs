@@ -1,13 +1,17 @@
+<!-- checkout.hbs -->
 <div class="container py-5">
-  <h2 class="text-center mb-4 text-info fw-bold"><i class="bi bi-credit-card"></i> Checkout</h2>
+  <h2 class="text-center mb-4 text-info fw-bold">
+    <i class="bi bi-credit-card"></i> Checkout
+  </h2>
 
   <div class="row g-4">
-    <!-- Shipping Info -->
+    <!-- Shipping + Payment Info -->
     <div class="col-md-6">
       <div class="card bg-dark text-light shadow-sm p-4">
         <h5 class="mb-3 text-info">Shipping Details</h5>
 
-        <form action="{{#if single}}/checkout/single{{else}}/checkout/confirm{{/if}}" method="POST">
+        <form action="{{#if single}}/checkout/single{{else}}/checkout/process-payment{{/if}}" method="POST">
+          <!-- Shipping Fields -->
           <div class="mb-3">
             <label class="form-label">Full Name</label>
             <input type="text" name="name" class="form-control classy-input" required>
@@ -34,34 +38,53 @@
             <input type="hidden" name="quantity" value="1">
           {{/if}}
 
-          <button href="/confirmation" type="submit" class="btn btn-success w-100 mt-3 fw-semibold">
-            <i class="bi bi-cart-check-fill me-1"></i> Confirm Order
+          <input type="hidden" name="sum" value="{{total}}">
+
+          <!-- Payment Fields -->
+          <hr class="my-4 border-secondary" />
+          <h5 class="mb-3 text-info">Payment Details (Demo)</h5>
+
+          <div class="mb-3">
+            <label class="form-label">Card Number</label>
+            <input type="text" name="ccno" class="form-control classy-input" value="4111111111111111" readonly>
+          </div>
+
+          <div class="row g-3">
+            <div class="col">
+              <label class="form-label">Expiry Month</label>
+              <input type="text" name="expmonth" class="form-control classy-input" value="12" readonly>
+            </div>
+            <div class="col">
+              <label class="form-label">Expiry Year</label>
+              <input type="text" name="expyear" class="form-control classy-input" value="2025" readonly>
+            </div>
+          </div>
+
+          <div class="mb-3 mt-3">
+            <label class="form-label">CVV</label>
+            <input type="text" name="cvv" class="form-control classy-input" value="123" readonly>
+          </div>
+
+          <button type="submit" class="btn btn-success w-100 mt-3 fw-semibold">
+            <i class="bi bi-cart-check-fill me-1"></i> Confirm Order & Pay (Demo)
           </button>
         </form>
       </div>
     </div>
 
-   <!-- Order Summary -->
-<div class="col-md-6">
-  <div class="card bg-dark text-light shadow-sm p-4">
-    <h5 class="mb-3 text-info">Order Summary</h5>
+    <!-- Order Summary -->
+    <div class="col-md-6">
+      <div class="card bg-dark text-light shadow-sm p-4">
+        <h5 class="mb-3 text-info">Order Summary</h5>
 
-    <ul class="list-group list-group-flush">
-      {{#each cart}}
-        <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center border-bottom">
-          <span>{{this.Pname}} (x{{this.quantity}})</span>
-          <span class="text-warning">${{this.Price}}</span>
-        </li>
-      {{/each}}
-    </ul>
-
-    <hr class="border-secondary" />
-    <h5 class="text-end mt-3">
-      Total: <span class="text-success">${{total}}</span>
-    </h5>
-  </div>
-</div>
-
+        <ul class="list-group list-group-flush">
+          {{#each cart}}
+            <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center border-bottom">
+              <span>{{this.Pname}} (x{{this.quantity}})</span>
+              <span class="text-warning">${{this.Price}}</span>
+            </li>
+          {{/each}}
+        </ul>
 
         <hr class="border-secondary" />
         <h5 class="text-end mt-3">
@@ -87,3 +110,22 @@
     outline: none;
   }
 </style>
+
+<!-- checkout-success.hbs -->
+<div class="container py-5 text-light">
+  <h2 class="text-success mb-3">✅ Order Successful</h2>
+  <p>Thank you, {{order.shipping.name}}! Your order has been placed.</p>
+  <p>Card ending in ****{{order.payment.cardEnding}}</p>
+  <p>Total Paid: <strong>${{order.total}}</strong></p>
+  <a href="/" class="btn btn-outline-light mt-4">Back to Home</a>
+</div>
+
+<!-- checkout-failed.hbs -->
+<div class="container py-5 text-light">
+  <h2 class="text-danger mb-3">❌ Payment Failed</h2>
+  <p>{{message}}</p>
+  {{#if raw}}
+    <pre class="bg-dark p-3 mt-3 text-warning">{{raw}}</pre>
+  {{/if}}
+  <a href="/checkout" class="btn btn-warning mt-4">Try Again</a>
+</div>

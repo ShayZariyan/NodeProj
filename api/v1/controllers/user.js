@@ -127,5 +127,28 @@ module.exports = {
       console.error(err);
       res.status(500).json({ msg: '❌ Server Error', error: err.message });
     }
+  },
+
+  promoteToManager : async (req, res) => {
+    try {
+      if (req.user?.role !== 'manager') {
+        return res.status(403).json({ success: false, message: 'Access denied' });
+      }
+  
+      const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        { role: 'manager' },
+        { new: true }
+      );
+  
+      if (!updatedUser) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+  
+      res.json({ success: true, user: updatedUser });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, error: err.message });
+    }
   }
 };

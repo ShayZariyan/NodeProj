@@ -12,6 +12,7 @@ const authRoutes = require('./api/v1/routes/auth');
 const cartRoutes = require('./api/v1/routes/cart');
 const checkoutRoute = require('./api/v1/routes/checkout');
 const authMiddleware = require('./api/v1/middlewares/auth');
+const adminRoutes = require('./api/v1/routes/admin');
 const verifyToken = require('./api/v1/middlewares/auth');
 const app = express();
 const path = require('path');
@@ -68,6 +69,9 @@ app.use((req, res, next) => {
   
           return total + (price * qty);
         }, 0).toFixed(2);
+      },
+      eq: function (a, b) {
+        return a === b;
       }
     },
     runtimeOptions: {
@@ -75,6 +79,7 @@ app.use((req, res, next) => {
       allowProtoMethodsByDefault: true
     }
   }));
+  
   
   app.use((req, res, next) => {
   res.locals.user = req.user || null;
@@ -86,8 +91,8 @@ app.set('view engine', 'hbs');
 app.set('views', './api/v1/views');
 app.set('view cache', false);
 
-const mongoConnStr = `mongodb+srv://Shay:shayshay@shay.uijvx.mongodb.net/Eshop`;
-//const mongoConnStr = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@shay.uijvx.mongodb.net/Eshop`;
+
+const mongoConnStr = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@shay.uijvx.mongodb.net/Eshop`;
 mongoose.connect(mongoConnStr, { 
     useNewUrlParser: true, 
     useUnifiedTopology: true 
@@ -104,6 +109,7 @@ app.use('/categories', categoryRoutes);
 app.use('/auth', authRoutes); 
 app.use('/cart', authMiddleware, cartRoutes);
 app.use('/checkout',authMiddleware, checkoutRoute);
+app.use('/admin', adminRoutes);
 
 
 module.exports = app;
