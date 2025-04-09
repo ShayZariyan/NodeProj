@@ -86,8 +86,7 @@ app.set('view engine', 'hbs');
 app.set('views', './api/v1/views');
 app.set('view cache', false);
 
-const mongoConnStr = `mongodb+srv://Shay:shayshay@shay.uijvx.mongodb.net/Eshop`;
-//const mongoConnStr = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@shay.uijvx.mongodb.net/Eshop`;
+const mongoConnStr = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@shay.uijvx.mongodb.net/Eshop`;
 mongoose.connect(mongoConnStr, { 
     useNewUrlParser: true, 
     useUnifiedTopology: true 
