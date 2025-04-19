@@ -110,22 +110,3 @@
     outline: none;
   }
 </style>
-
-<!-- checkout-success.hbs -->
-<div class="container py-5 text-light">
-  <h2 class="text-success mb-3">✅ Order Successful</h2>
-  <p>Thank you, {{order.shipping.name}}! Your order has been placed.</p>
-  <p>Card ending in ****{{order.payment.cardEnding}}</p>
-  <p>Total Paid: <strong>${{order.total}}</strong></p>
-  <a href="/" class="btn btn-outline-light mt-4">Back to Home</a>
-</div>
-
-<!-- checkout-failed.hbs -->
-<div class="container py-5 text-light">
-  <h2 class="text-danger mb-3">❌ Payment Failed</h2>
-  <p>{{message}}</p>
-  {{#if raw}}
-    <pre class="bg-dark p-3 mt-3 text-warning">{{raw}}</pre>
-  {{/if}}
-  <a href="/checkout" class="btn btn-warning mt-4">Try Again</a>
-</div>

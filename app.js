@@ -19,9 +19,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const gptRoute = require("./api/v1/routes/gptapi");
 require('./api/v1/middlewares/fbggl');
+const methodOverride = require('method-override');
 
 
 
+app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'public/images'), {
     extensions: ['jpg', 'jpeg', 'png', 'gif'],
@@ -45,6 +47,8 @@ app.use((req, res, next) => {
 
   app.engine('hbs', exphbs.engine({
     extname: '.hbs',
+    defaultLayout: 'main', // 👈 make sure this matches layouts/main.hbs
+    layoutsDir: path.join(__dirname, 'api/v1/views/layouts'),
     helpers: {
       json: function (context) {
         return JSON.stringify(context, null, 2);
@@ -60,13 +64,10 @@ app.use((req, res, next) => {
       },
       calculateTotal: function (items) {
         if (!Array.isArray(items)) return '0.00';
-  
         return items.reduce((total, item) => {
           const price = item?.productId?.Price;
           const qty = item?.quantity;
-  
           if (typeof price !== 'number' || typeof qty !== 'number') return total;
-  
           return total + (price * qty);
         }, 0).toFixed(2);
       },
@@ -99,6 +100,7 @@ mongoose.connect(mongoConnStr, {
 })
     .then(() => console.log('Connected To Mongo'))
     .catch((err) => console.error('Connection Failed:', err));
+
     
 
 app.use("/", gptRoute);

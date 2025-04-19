@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-black text-light">
+
 <div class="container-fluid py-4">
   <div class="row">
     <!-- Sidebar -->
@@ -10,7 +20,7 @@
       </div>
     </div>
 
-    <!-- Content -->
+    <!-- Main Content -->
     <div class="col-md-9">
       <div id="adminContent" class="card bg-dark text-light p-4 shadow-sm">
         <h3>Welcome, Admin 👋</h3>
@@ -20,4 +30,174 @@
   </div>
 </div>
 
+<!-- ✅ Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header">
+        <h5 class="modal-title">✏️ Edit Product</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="editProductForm" method="POST">
+        <input type="hidden" name="_id" id="editProductId">
+        <div class="modal-body row g-3">
+          <input type="hidden" name="Pid" id="editProductId">
+          <div class="col-md-6">
+            <label for="editPname" class="form-label">Name</label>
+            <input type="text" class="form-control" name="Pname" id="editPname" required>
+          </div>
+          <div class="col-md-6">
+            <label for="editPrice" class="form-label">Price</label>
+            <input type="number" class="form-control" name="Price" id="editPrice" required>
+          </div>
+          <div class="col-md-12">
+            <label for="editPdesc" class="form-label">Description</label>
+            <textarea class="form-control" name="Pdesc" id="editPdesc"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label for="editPicname" class="form-label">Image</label>
+            <input type="text" class="form-control" name="Picname" id="editPicname">
+          </div>
+          <div class="col-md-3">
+            <label for="editStatus" class="form-label">Status</label>
+            <select class="form-select" name="Status" id="editStatus">
+              <option value="1">Active</option>
+              <option value="0">Inactive</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="editCid" class="form-label">Category ID</label>
+            <input type="number" class="form-control" name="Cid" id="editCid" required>
+          </div>
+        </div>
+        <div class="modal-footer"><button type="submit" class="btn btn-success">💾 Save</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header">
+        <h5 class="modal-title">➕ Add New Product</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/products/create" method="POST">
+        <div class="modal-body row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Product ID (Pid)</label>
+            <input type="number" class="form-control" name="Pid" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" name="Pname" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Price</label>
+            <input type="number" class="form-control" name="Price" required>
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="Pdesc" required></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Image (picname)</label>
+            <input type="text" class="form-control" name="picname" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Category ID (cid)</label>
+            <input type="number" class="form-control" name="cid" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Add Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE PRODUCT FORM -->
+<form action="/admin/products/delete/${p._id}" method="POST" style="display:inline;">
+  <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
+</form>
+
+
+<!-- ✅ Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header">
+        <h5 class="modal-title">✏️ Edit Category</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/categories/update" method="POST">
+        <input type="hidden" name="_method" value="PUT">
+        <input type="hidden" name="_id" id="editCategoryId">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editCname" class="form-label">Name</label>
+            <input type="text" class="form-control" name="Cname" id="editCname" required>
+          </div>
+          <div class="mb-3">
+            <label for="editCdesc" class="form-label">Description</label>
+            <input type="text" class="form-control" name="Cdesc" id="editCdesc">
+          </div>
+        </div>
+        <div class="modal-footer"><button type="submit" class="btn btn-success">Save</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header">
+        <h5 class="modal-title">➕ Add Category</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/categories/create" method="POST">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Category ID (Cid)</label>
+            <input type="number" class="form-control" name="Cid" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Category Name (Cname)</label>
+            <input type="text" class="form-control" name="Cname" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Image Filename (picname)</label>
+            <input type="text" class="form-control" name="picname" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description (Cdesc)</label>
+            <input type="text" class="form-control" name="Cdesc" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Parent Category (optional)</label>
+            <input type="text" class="form-control" name="ParentCat" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Add Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CATEGORY FORM -->
+<form action="/admin/categories/delete/${c._id}" method="POST" style="display:inline;">
+  <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
+</form>
+
+
 <script src="/js/admin-panel.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

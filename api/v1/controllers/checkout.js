@@ -163,73 +163,101 @@ module.exports = {
       res.status(500).render('error', { title: 'Error', message: 'Failed to place single order' });
     }
   },
-  
-  processPayment : async (req, res) => {
+
+  processPayment: async (req, res) => {
     try {
       const {
         name, address, city, zip, phone,
-        ccno, expmonth, expyear, cvv, sum
+        ccno, expmonth, expyear, cvv, sum,
+        productId
       } = req.body;
-  
+
       const userId = req.user._id;
       const expdate = `${expmonth}${expyear.slice(-2)}`;
-  
-      const cart = await Cart.findOne({ user: userId }).populate('items.product');
-      if (!cart || cart.items.length === 0) {
-        return res.render('checkout-failed', { message: 'Cart is empty.' });
-      }
-  
-      const response = await axios.post('https://secure5.tranzila.com/cgi-bin/tranzila31.cgi', null, {
-        params: {
-          supplier: 'tranzilatest',
-          sum,
-          ccno,
-          expdate,
-          cvv,
-          currency: '1',
-          tranmode: 'A',
-          lang: 'il'
+
+      let orderItems = [];
+      let totalAmount = parseFloat(sum);
+
+      // ✅ SINGLE PRODUCT CHECKOUT
+      if (productId) {
+        const product = await Product.findById(productId);
+        if (!product) return res.render('checkout-failed', { message: 'Product not found.' });
+
+        orderItems.push({
+          product: product._id,
+          quantity: 1,
+          price: product.Price
+        });
+
+        totalAmount = product.Price;
+
+      } else {
+        // ✅ CART CHECKOUT
+        const cart = await Cart.findOne({ userId }).populate('items.productId');
+        if (!cart || cart.items.length === 0) {
+          return res.render('checkout-failed', { message: 'Cart is empty.' });
         }
+
+        orderItems = cart.items.map(item => ({
+          product: item.productId._id,
+          quantity: item.quantity,
+          price: item.productId.Price
+        }));
+
+        totalAmount = cart.items.reduce((acc, item) => acc + item.productId.Price * item.quantity, 0).toFixed(2);
+
+        cart.items = [];
+        await cart.save();
+      }
+
+      // ✅ SEND PAYMENT TO TRANZILA
+      const formData = qs.stringify({
+        supplier: 'tranzilatest',
+        sum: totalAmount,
+        ccno,
+        expdate,
+        cvv,
+        currency: '1',
+        tranmode: 'A',
+        lang: 'il'
       });
-  
+
+      const response = await axios.post(
+        'https://secure5.tranzila.com/cgi-bin/tranzila31.cgi',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+      );
+
       const success = response.data.includes('Response=000');
-  
-      // Prepare items
-      const orderItems = cart.items.map(item => ({
-        product: item.product._id,
-        quantity: item.quantity,
-        price: item.product.Price
-      }));
-  
-      // Save order
+
       const order = new Order({
         user: userId,
         shipping: { name, address, city, zip, phone },
         cartItems: orderItems,
-        total: sum,
+        total: totalAmount,
         payment: {
           cardEnding: ccno.slice(-4),
           status: success ? 'Paid' : 'Failed',
           tranzilaRaw: response.data
         }
       });
-  
+
       await order.save();
-  
-      // Clear cart if successful
+
       if (success) {
-        cart.items = [];
-        await cart.save();
-        return res.render('checkout-success', { message: 'Payment successful!', order });
+        return res.render('checkout-success', { order });
       } else {
         return res.render('checkout-failed', { message: 'Payment failed.', raw: response.data });
       }
-  
-    } catch (error) {
-      console.error(error);
-      res.render('checkout-failed', { message: 'An error occurred.', raw: error.message });
+
+    } catch (err) {
+      console.error('❌ Payment Error:', err);
+      res.render('checkout-failed', { message: 'An error occurred.', raw: err.message });
     }
   }
-
 };
 

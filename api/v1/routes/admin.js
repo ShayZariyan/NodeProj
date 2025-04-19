@@ -1,41 +1,62 @@
 const express = require('express');
-const router = express.Router();
+const adminRouter = express.Router();
 const verifyToken = require('../middlewares/auth');
-const Order = require('../models/order');
 
+const {
+  getTopProducts,
+  getAllProducts,
+  getProductById,
+  getAllCategories,
+  getCategoryById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  createCategory,
+  updateCategory,
+  deleteCategory
+} = require('../controllers/admin');
 
-// 🔐 Only allow access to managers
-router.get('/', verifyToken, (req, res) => {
-  if (req.user?.role !== 'manager') return res.redirect('/');
-  res.render('admin', { user: req.user });
-})
+// ✅ Middleware: Require login + manager role
+adminRouter.use(verifyToken);
+adminRouter.use((req, res, next) => {
+  if (req.user?.role !== 'manager') return res.sendStatus(403);
+  next();
+});
 
-router.get('/top-products', verifyToken, async (req, res) => {
-    if (req.user?.role !== 'manager') return res.status(403).json({ error: 'Forbidden' });
-  
-    const top = await Order.aggregate([
-      { $unwind: '$cartItems' },
-      {
-        $group: {
-          _id: '$cartItems.product',
-          totalSold: { $sum: '$cartItems.quantity' }
-        }
-      },
-      { $sort: { totalSold: -1 } },
-      { $limit: 3 },
-      {
-        $lookup: {
-          from: 'products',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'product'
-        }
-      },
-      { $unwind: '$product' }
-    ]);
-  
-    res.json(top);
-  });
-  
+// ✅ JSON Endpoints
+adminRouter.get('/data/top-products', getTopProducts);
+adminRouter.get('/data/products', getAllProducts);
+adminRouter.get('/data/products/:id', getProductById);
+adminRouter.get('/data/categories', getAllCategories);
+adminRouter.get('/data/categories/:id', getCategoryById);
 
-module.exports = router;
+// ✅ View: Admin Panel (GET only)
+adminRouter.get('/', (req, res) => {
+  res.render('admin', { user: req.user, title: 'Admin Panel' });
+});
+
+// ✅ Form-Based Routes (for Bootstrap modals in admin.hbs)
+adminRouter.post('/products/create', createProduct);
+
+adminRouter.post('/products/update', async (req, res, next) => {
+  req.params.id = req.body.Pid;
+  await updateProduct(req, res, next);
+});
+
+adminRouter.post('/products/delete/:id', deleteProduct);
+
+adminRouter.post('/categories/create', createCategory);
+
+adminRouter.post('/categories/update', async (req, res, next) => {
+  req.params.id = req.body.Cid;
+  await updateCategory(req, res, next);
+});
+
+adminRouter.post('/categories/delete/:id', deleteCategory);
+
+// ✅ Optional: Catch bad POST /admin calls (debug safety)
+adminRouter.post('/', (req, res) => {
+  res.status(400).send('❌ Invalid POST to /admin. Check your form action.');
+});
+
+module.exports = adminRouter;

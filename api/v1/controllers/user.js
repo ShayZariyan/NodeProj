@@ -9,13 +9,21 @@ module.exports = {
   // Get All Users
   getAll: async (req, res) => {
     try {
-      const users = await UsersModel.find();
-      res.status(200).json({ msg: `All users:`, users });
+      // ✅ Only allow managers
+      if (!req.user || req.user.role !== 'manager') {
+        return res.status(403).json({ msg: '❌ Access Denied' });
+      }
+  
+      // ✅ Exclude passwords
+      const users = await UsersModel.find({}, '-Upass');
+  
+      res.status(200).json({ msg: 'All users:', users });
+  
     } catch (err) {
       console.error(err);
       res.status(500).json({ msg: '❌ Server Error', error: err.message });
     }
-  },
+  },  
 
   // Get User by Uid
   getByID: async (req, res) => {

@@ -1,0 +1,11 @@
+
+<div class="container py-5 text-center text-danger">
+  <p>{{message}}</p>
+{{#if raw}}
+  <pre class="bg-dark p-3 mt-3 text-warning">{{raw}}</pre>
+{{/if}}
+
+  <h2><i class="bi bi-x-circle"></i> Payment Failed</h2>
+  <p>We couldn’t process your payment. Please try again or contact support.</p>
+  <a href="/checkout" class="btn btn-outline-light mt-3"><i class="bi bi-arrow-left"></i> Back to Checkout</a>
+</div>
