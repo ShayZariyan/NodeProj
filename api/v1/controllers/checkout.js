@@ -2,6 +2,7 @@ const Cart = require('../models/cart');
 const Product = require('../models/product');
 const Order = require('../models/order');
 const axios = require('axios');
+const mongoose = require('mongoose');
 module.exports = {
   showCheckoutPage: async (req, res) => {
     try {
