@@ -78,17 +78,27 @@ module.exports = {
     }
   },  
   
-  checkoutSinglePage: async (req, res) => {
+  checkoutSinglePage : async (req, res) => {
     try {
       const userId = req.user._id;
       const productId = req.params.id;
   
-      const product = await Product.findById(productId);
-      if (!product) {
-        return res.status(404).render('error', { title: 'Not Found', message: 'Product not found' });
+      // Validate ID format
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+        return res.status(400).render('error', {
+          title: 'Invalid ID',
+          message: 'Product ID format is invalid'
+        });
       }
   
-      // Fetch existing cart
+      const product = await Product.findById(productId);
+      if (!product) {
+        return res.status(404).render('error', {
+          title: 'Not Found',
+          message: 'Product not found'
+        });
+      }
+  
       const cart = await Cart.findOne({ userId }).populate('items.productId');
   
       let cartItems = [];
@@ -102,7 +112,6 @@ module.exports = {
         }));
       }
   
-      // Merge the selected product
       const existing = cartItems.find(i => i._id.toString() === product._id.toString());
       if (existing) {
         existing.quantity += 1;
@@ -115,13 +124,10 @@ module.exports = {
         });
       }
   
-      // Calculate total
       const total = parseFloat(
         cartItems.reduce((sum, item) => sum + item.Price * item.quantity, 0).toFixed(2)
       );
-      
   
-      // Render with merged data
       res.render('checkout', {
         title: 'Buy Now',
         cart: cartItems,
@@ -132,7 +138,10 @@ module.exports = {
   
     } catch (err) {
       console.error('❌ Error loading single checkout page:', err);
-      res.status(500).render('error', { title: 'Error', message: 'Could not load single product checkout' });
+      res.status(500).render('error', {
+        title: 'Error',
+        message: 'Could not load single product checkout'
+      });
     }
   },
   
