@@ -78,8 +78,13 @@ module.exports = {
     }
   },  
   
-  checkoutSinglePage : async (req, res) => {
+  checkoutSinglePage: async (req, res) => {
     try {
+      // 🔒 Prevent crash if user not logged in
+      if (!req.user || !req.user._id) {
+        return res.redirect('/auth'); // or render login prompt
+      }
+  
       const userId = req.user._id;
       const productId = req.params.id;
   
@@ -143,7 +148,7 @@ module.exports = {
         message: 'Could not load single product checkout'
       });
     }
-  },
+  },  
   
 
   // ✅ HANDLE SINGLE PRODUCT ORDER CONFIRMATION
