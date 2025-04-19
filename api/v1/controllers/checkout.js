@@ -238,9 +238,8 @@ module.exports = {
         tranmode: 'A',
         lang: 'il'
       });
-
       const response = await axios.post(
-        'https://secure5.tranzila.com/cgi-bin/tranzila31.cgi',
+        'https://direct.tranzila.com/tranzilatest.cgi',
         formData,
         {
           headers: {
