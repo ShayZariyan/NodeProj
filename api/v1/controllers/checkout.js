@@ -3,6 +3,8 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 const axios = require('axios');
 const mongoose = require('mongoose');
+const qs = require('qs');
+
 module.exports = {
   showCheckoutPage: async (req, res) => {
     try {
