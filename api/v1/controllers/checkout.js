@@ -10,29 +10,24 @@ module.exports = {
     try {
       const userId = req.user._id;
       const cart = await Cart.findOne({ userId }).populate('items.productId');
-
-      if (!cart || cart.items.length === 0) {
-        return res.redirect('/cart');
-      }
+      if (!cart || cart.items.length === 0) return res.redirect('/cart');
 
       const cartItems = cart.items.map(item => ({
         _id: item.productId._id,
         Pname: item.productId.Pname,
         Price: item.productId.Price,
-        quantity: item.quantity,
+        quantity: item.quantity
       }));
 
       const total = parseFloat(
         cartItems.reduce((sum, item) => sum + item.Price * item.quantity, 0).toFixed(2)
       );
-      
 
       res.render('checkout', {
         title: 'Checkout',
         cart: cartItems,
         total
       });
-
     } catch (err) {
       console.error('❌ Error showing checkout page:', err);
       res.status(500).render('error', { title: 'Error', message: 'Could not load checkout page' });
@@ -43,22 +38,13 @@ module.exports = {
     try {
       const userId = req.user._id;
       const { name, address, city, zip, phone } = req.body;
-  
       const cart = await Cart.findOne({ userId }).populate('items.productId');
       if (!cart || cart.items.length === 0) return res.redirect('/cart');
-  
-      // 💡 Define cartItems here:
-      const cartItems = cart.items.map(item => ({
-        _id: item.productId._id,
-        Pname: item.productId.Pname,
-        Price: item.productId.Price,
-        quantity: item.quantity,
-      }));
-  
+
       const total = parseFloat(
-        cartItems.reduce((sum, item) => sum + item.Price * item.quantity, 0).toFixed(2)
+        cart.items.reduce((sum, item) => sum + item.productId.Price * item.quantity, 0).toFixed(2)
       );
-  
+
       const order = new Order({
         userId,
         items: cart.items.map(item => ({
@@ -68,37 +54,31 @@ module.exports = {
         shipping: { name, address, city, zip, phone },
         total
       });
-  
+
       await order.save();
       cart.items = [];
       await cart.save();
-  
+
       res.render('confirmation', { title: 'Order Placed', order });
-  
     } catch (err) {
       console.error('❌ Error placing order:', err);
       res.status(500).render('error', { title: 'Error', message: 'Failed to place order' });
     }
-  },  
-  
+  },
+
   checkoutSinglePage: async (req, res) => {
     try {
-      // 🔒 Prevent crash if user not logged in
-      if (!req.user || !req.user._id) {
-        return res.redirect('/auth'); // or render login prompt
-      }
-  
+      if (!req.user || !req.user._id) return res.redirect('/auth');
       const userId = req.user._id;
       const productId = req.params.id;
-  
-      // Validate ID format
+
       if (!mongoose.Types.ObjectId.isValid(productId)) {
         return res.status(400).render('error', {
           title: 'Invalid ID',
           message: 'Product ID format is invalid'
         });
       }
-  
+
       const product = await Product.findById(productId);
       if (!product) {
         return res.status(404).render('error', {
@@ -106,11 +86,10 @@ module.exports = {
           message: 'Product not found'
         });
       }
-  
+
       const cart = await Cart.findOne({ userId }).populate('items.productId');
-  
       let cartItems = [];
-  
+
       if (cart && cart.items.length > 0) {
         cartItems = cart.items.map(item => ({
           _id: item.productId._id,
@@ -119,7 +98,7 @@ module.exports = {
           quantity: item.quantity
         }));
       }
-  
+
       const existing = cartItems.find(i => i._id.toString() === product._id.toString());
       if (existing) {
         existing.quantity += 1;
@@ -131,11 +110,11 @@ module.exports = {
           quantity: 1
         });
       }
-  
+
       const total = parseFloat(
         cartItems.reduce((sum, item) => sum + item.Price * item.quantity, 0).toFixed(2)
       );
-  
+
       res.render('checkout', {
         title: 'Buy Now',
         cart: cartItems,
@@ -143,7 +122,6 @@ module.exports = {
         single: true,
         productId: product._id
       });
-  
     } catch (err) {
       console.error('❌ Error loading single checkout page:', err);
       res.status(500).render('error', {
@@ -151,10 +129,8 @@ module.exports = {
         message: 'Could not load single product checkout'
       });
     }
-  },  
-  
+  },
 
-  // ✅ HANDLE SINGLE PRODUCT ORDER CONFIRMATION
   placeSingleOrder: async (req, res) => {
     try {
       const userId = req.user._id;
@@ -174,7 +150,6 @@ module.exports = {
 
       await order.save();
       res.render('confirmation', { title: 'Order Placed', order });
-
     } catch (err) {
       console.error('❌ Error placing single order:', err);
       res.status(500).render('error', { title: 'Error', message: 'Failed to place single order' });
@@ -191,11 +166,9 @@ module.exports = {
 
       const userId = req.user._id;
       const expdate = `${expmonth}${expyear.slice(-2)}`;
-
       let orderItems = [];
       let totalAmount = parseFloat(sum);
 
-      // ✅ SINGLE PRODUCT CHECKOUT
       if (productId) {
         const product = await Product.findById(productId);
         if (!product) return res.render('checkout-failed', { message: 'Product not found.' });
@@ -207,9 +180,7 @@ module.exports = {
         });
 
         totalAmount = product.Price;
-
       } else {
-        // ✅ CART CHECKOUT
         const cart = await Cart.findOne({ userId }).populate('items.productId');
         if (!cart || cart.items.length === 0) {
           return res.render('checkout-failed', { message: 'Cart is empty.' });
@@ -221,13 +192,14 @@ module.exports = {
           price: item.productId.Price
         }));
 
-        totalAmount = cart.items.reduce((acc, item) => acc + item.productId.Price * item.quantity, 0).toFixed(2);
+        totalAmount = parseFloat(cart.items.reduce(
+          (acc, item) => acc + item.productId.Price * item.quantity, 0
+        ).toFixed(2));
 
         cart.items = [];
         await cart.save();
       }
 
-      // ✅ SEND PAYMENT TO TRANZILA
       const formData = qs.stringify({
         supplier: 'tranzilatest',
         sum: totalAmount,
@@ -238,14 +210,11 @@ module.exports = {
         tranmode: 'A',
         lang: 'il'
       });
+
       const response = await axios.post(
         'https://direct.tranzila.com/tranzilatest.cgi',
         formData,
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
 
       const success = response.data.includes('Response=000');
@@ -265,15 +234,13 @@ module.exports = {
       await order.save();
 
       if (success) {
-        return res.render('checkout-success', { order });
+        res.render('checkout-success', { order });
       } else {
-        return res.render('checkout-failed', { message: 'Payment failed.', raw: response.data });
+        res.render('checkout-failed', { message: 'Payment failed.', raw: response.data });
       }
-
     } catch (err) {
       console.error('❌ Payment Error:', err);
       res.render('checkout-failed', { message: 'An error occurred.', raw: err.message });
     }
   }
 };
-

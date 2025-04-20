@@ -98,15 +98,26 @@
 <style>
   .classy-input {
     background-color: #1c1e22;
-    color: #e1e1e1;
+    color: #ffffff; /* Make input text clearly visible */
     border: 1px solid #3a3f47;
     border-radius: 6px;
     padding: 10px;
+    caret-color: #17a2b8; /* Optional: color of blinking cursor */
   }
 
   .classy-input:focus {
     background-color: #202328;
     border-color: #17a2b8;
+    color: #ffffff; /* Ensure color stays white on focus */
     outline: none;
   }
+
+  .classy-input::placeholder {
+    color: #888;
+  }
+
+  .form-label {
+    color: #ccc; /* Optional: make labels stand out slightly more */
+  }
 </style>
+
